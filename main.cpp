@@ -2,15 +2,96 @@
 #include <fstream>
 #include <regex>
 #include <vector>
+#include <list>
 
 using namespace std;
 
+
+
+//create lists for edges
+list<int> *Graph;
+//Resize list to number of resources, processes
+void Resize(int nodes)
+{
+	Graph = new list<int>[nodes];
+}
+
+//function to add edges from a process to resource and vice-versa
+void addEdge(int src, int dest)
+{
+	//directed so only src to dest
+	Graph[src].push_back(dest);
+}
+
+//takes in adjacency matrix to connect directed edges to nodes
+void addGraph(vector<vector<int>> Matrix)
+{
+	for (int i = 0; i < Matrix.size(); i++)
+        {
+                for (int j = 0; j < Matrix[i].size(); j++)
+                {
+			if(i != j)
+			{
+                		if(Matrix[i][j] == 1)
+				{
+					addEdge(i,j);
+				}		
+                	}
+		}
+        }
+}
+
+vector<int> DFSsearch(int start_node, int num_nodes)
+{
+	vector<bool> visit(num_nodes, false);
+	vector<int> nums;
+    // Create a queue, easier to implement stack
+    stack<int> q;
+
+    // Push the current source node.
+    q.push(start_node);
+
+    while (!q.empty())
+    {
+        // Pop a node of queue
+        start_node = q.top();
+        q.pop();
+        if (!visit[start_node])
+        {
+            visit[start_node] = true;
+	    nums.push_back(start_node);
+	                
+        }
+
+        // Get all adjacent vertices of the popped vertex s
+        // If a adjacent has not been visited, then push it
+        // to the stack.
+        for (auto i = Graph[start_node].begin(); i != Graph[start_node].end(); ++i)
+            if (!visit[*i])
+                q.push(*i);
+    }
+	return nums;
+
+} 
+
+bool ProcSearch(int proc_num, vector<int> num)
+{
+	for(int i = 0; i < num.size(); i++)
+	{
+		if(num.at(i) == proc_num)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 int main() {
     /****************VARIABLES***************/
     ifstream inFile;
     string fileName, currentLine, numProcesses, numResources, rStr;
     vector<vector<int>> adjMat;
-    int processes, resources, *resourceList;
+    int processes, resources, *resourceList, Nodes;
+    bool isKnot;
     /****************************************/
     //loop prompts for file name until correct name is given
     do{
@@ -88,8 +169,46 @@ int main() {
         //Number of resources
         //Number of resources for each process
         //The adjacency matrix
+	
 
-    delete [] resourceList;
-    inFile.close();
+	delete [] resourceList;
+    	inFile.close();
+
+	//Knot detection algorithm
+	//First Get number of nodes
+	Nodes =  (processes + resources);
+	//resize list
+	Resize(Nodes);
+	//add directed edges of graph
+	addGraph(adjMat);
+	vector<int> temp;
+
+	
+        for (int i = 0; i < adjMat.size(); i++)
+        {
+                for (int j = 0; j < adjMat[i].size(); j++)
+                {
+			cout << adjMat[i][j] << " ";
+		}
+		cout << endl;
+	}
+	
+	for(int i = 0; i < processes; i++)
+	{
+		temp = DFSsearch(i, Nodes);
+		for(int j = 0; j < processes; j++)
+		  {	
+			isKnot = ProcSearch(j, temp);
+			if(isKnot == false)
+			{
+				cout << "Graph contains no knot..." << endl;
+				exit(0);
+			}
+			
+		}
+		temp.clear();
+	}	
+	cout << "Graph contains a knot, deadlock in Graph... " << endl;
+
     return 0;
 }
