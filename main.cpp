@@ -119,7 +119,6 @@ int main() {
                 //create a list of resources for each process
                 resourceList = new int[processes];
                 //prime a regex string for later use
-                rStr = "(\\d,){" + to_string(processes - 1) + "}\\d";
 
             }
             //similar process to the block above except
@@ -127,6 +126,7 @@ int main() {
             else if(regex_match(currentLine, sm, regex("(num_resources=)\\d"))){
                 numResources = currentLine.substr(14, currentLine.size());
                 resources = stoi(numResources);
+                rStr = "(\\d,){" + to_string(resources - 1) + "}\\d";
 
             }
             //check for the patter created in the first if block
@@ -183,7 +183,6 @@ int main() {
 	addGraph(adjMat);
 	vector<int> temp;
 
-	
         for (int i = 0; i < adjMat.size(); i++)
         {
                 for (int j = 0; j < adjMat[i].size(); j++)
