@@ -48,12 +48,12 @@ vector<int> DFSsearch(int start_node, int num_nodes)
     // Create a queue, easier to implement stack
     stack<int> q;
 
-    // Push the current source node.
+    // Push the current node.
     q.push(start_node);
 
     while (!q.empty())
     {
-        // Pop a node of queue
+        // Pop node
         start_node = q.top();
         q.pop();
         if (!visit[start_node])
@@ -63,9 +63,8 @@ vector<int> DFSsearch(int start_node, int num_nodes)
 	                
         }
 
-        // Get all adjacent vertices of the popped vertex s
-        // If a adjacent has not been visited, then push it
-        // to the stack.
+        // Get all vertexes of node
+        // Push non-visited nodes to stack
         for (auto i = Graph[start_node].begin(); i != Graph[start_node].end(); ++i)
             if (!visit[*i])
                 q.push(*i);
